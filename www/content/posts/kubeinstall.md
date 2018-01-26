@@ -79,13 +79,13 @@ On kubernetes master, as non-root user, run:
 $ TOKEN=$(sudo -- kubeadm token generate)
 # Add line below to access kubernetes API via ssh tunneling
 $ SSH_TUNNEL_OPT="--apiserver-cert-extra-sans=localhost"
-$ sudo -- kubeadm init $SSH_TUNNEL_OPT --token '$TOKEN'
+$ sudo -- kubeadm init $SSH_TUNNEL_OPT --token "$TOKEN"
 $ mkdir -p $HOME/.kube
-$ sudo cp /etc/kubernetes/admin.conf \$HOME/.kube/config
-$ sudo chown -R qserv:qserv \$HOME/.kube
-$ KUBEVER=\$(kubectl version | base64 | tr -d '\n')
+$ sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+$ sudo chown -R qserv:qserv $HOME/.kube
+$ KUBEVER=$(kubectl version | base64 | tr -d '\n')
 # Install Weave network plugin
-$ kubectl apply -f \"https://cloud.weave.works/k8s/net?k8s-version=\$KUBEVER\"
+$ kubectl apply -f \"https://cloud.weave.works/k8s/net?k8s-version=$KUBEVER\"
 $ HASH=$(openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //')
 ```
 
@@ -95,7 +95,7 @@ On each other kubernetes machines,  as non-root user, run:
 # Get $TOKEN and $HASH from master and export them on machine
 # Assuming kubernetes master dns name is kubernetes-master.domain.net
 
-$ kubeadm join --token '$TOKEN' --discovery-token-ca-cert-hash 'sha256:$HASH'
+$ kubeadm join --token "$TOKEN" --discovery-token-ca-cert-hash "sha256:$HASH"
 kubernetes-master.domain.net :6443
 ```
 
