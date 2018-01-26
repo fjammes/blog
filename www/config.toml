@@ -1,0 +1,9 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+theme = "minimo"
+title = "Cloud software and Devops"
+
+# minimo
+[params.settings]
+
+homepageSections = ["recent_posts", "tags"]
