@@ -35,14 +35,18 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 ```
 
-## Use yum to install:
+## Install dependencies
 
 ```
-docker-engine: 1.12.3-1.el7.centos  
-kubeadm: 1.9.1-0  
-kubectl: 1.9.1-0 
-kubelet: 1.9.1-0 
-kubernetes-cni: 0.6.0-0
+sudo yum install docker-engine-1.12.3-1.el7.centos \
+    kubeadm-1.9.1-0 kubectl-1.9.1-0 \
+    kubelet-1.9.1-0 kubernetes-cni-0.6.0-0
+```
+
+## Disable swap
+
+```
+$ sudo swapoff -a
 ```
 
 ## Set up systemd configuration
@@ -51,6 +55,27 @@ In */etc/systemd/system/kubelet.service.d/10-kubeadm.conf*, comment line below:
 
 ```
 #Environment="KUBELET_CGROUP_ARGS=
+```
+
+This will give
+
+```
+$ cat /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+[Service]
+Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf
+--kubeconfig=/etc/kubernetes/kubelet.conf"
+Environment="KUBELET_SYSTEM_PODS_ARGS=--pod-manifest-path=/etc/kubernetes/manifests
+--allow-privileged=true"
+Environment="KUBELET_NETWORK_ARGS=--network-plugin=cni
+--cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin"
+Environment="KUBELET_DNS_ARGS=--cluster-dns=10.96.0.10
+--cluster-domain=cluster.local"
+Environment="KUBELET_AUTHZ_ARGS=--authorization-mode=Webhook
+--client-ca-file=/etc/kubernetes/pki/ca.crt"
+Environment="KUBELET_CADVISOR_ARGS=--cadvisor-port=0"
+# Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=systemd"
+Environment="KUBELET_CERTIFICATE_ARGS=--rotate-certificates=true
+--cert-dir=/var/lib/kubelet/pki"
 ```
 
 Create file */etc/sysctl.d/90-kubernetes.conf*, owned by root with read
@@ -65,10 +90,10 @@ net.bridge.bridge-nf-call-iptables = 1
 Restart systemd
 
 ```
-$ /bin/systemctl daemon-reload
-$ /bin/systemctl enable docker 
-$ /bin/systemctl enable kubelet
-$ /bin/systemctl restart systemd-sysctl
+$ sudo /bin/systemctl daemon-reload
+$ sudo /bin/systemctl enable docker 
+$ sudo /bin/systemctl enable kubelet
+$ sudo /bin/systemctl restart systemd-sysctl
 ```
 
 # Create kubernetes cluster
