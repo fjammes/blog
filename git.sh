@@ -1,1 +1,1 @@
-git commit -m "Update" && gp
+git commit -m "Update" && git push
